@@ -1,0 +1,39 @@
+[
+    {
+        "name": "Task Manager Pro",
+        "description": "Aplikasi manajemen tugas dengan fitur drag & drop dan real-time collaboration",
+        "url": "https://taskmanager-demo.netlify.app",
+        "icon": "📋",
+        "category": "Productivity",
+        "status": "active",
+        "tags": ["react", "firebase", "pwa"]
+    },
+    {
+        "name": "Weather Dashboard",
+        "description": "Dashboard cuaca interaktif dengan visualisasi data real-time",
+        "url": "https://weather-app.vercel.app",
+        "icon": "🌤️",
+        "category": "Data Visualization",
+        "status": "active",
+        "tags": ["vue", "api", "charts"]
+    },
+    {
+        "name": "E-Commerce Store",
+        "description": "Toko online full-stack dengan payment gateway integration",
+        "url": "https://shop-demo.herokuapp.com",
+        "icon": "🛍️",
+        "category": "Web App",
+        "status": "active",
+        "tags": ["nextjs", "stripe", "mongodb"]
+    },
+    {
+        "name": "Chat Application",
+        "description": "Real-time chat app dengan end-to-end encryption",
+        "url": "https://chat-app-demo.netlify.app",
+        "icon": "💬",
+        "category": "Communication",
+        "status": "maintenance",
+        "tags": ["socket.io", "node", "react"]
+    }
+    // ... tambahkan 36+ items lainnya
+]
