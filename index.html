@@ -31,37 +31,13 @@
 
   .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
 
-  header.hero{ padding:64px 0 26px; border-bottom:1px solid var(--card-border); }
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px;
-    font-size:12px; letter-spacing:.14em; color: var(--ink-faint);
-    text-transform:uppercase; margin-bottom:18px;
-  }
-  .eyebrow .bar{ width:18px; height:1px; background: var(--ink-faint); }
-
-  h1.title{
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:700;
-    font-size:clamp(32px, 5.5vw, 56px);
-    line-height:1.08;
-    margin:0 0 16px;
-    letter-spacing:-.01em;
-  }
-  p.subtitle{
-    font-size:clamp(14px, 1.6vw, 16px);
-    color: var(--ink-soft);
-    max-width:600px;
-    line-height:1.6;
-    margin:0 0 30px;
-  }
-  .stat-row{ display:flex; gap:26px; font-size:12px; color:var(--ink-faint); padding-bottom:4px; }
-  .stat-row b{ color:var(--ink); font-weight:600; }
-
-  .controls{ position:sticky; top:0; z-index:5; background:var(--bg); padding-top:22px; }
+  /* ---------- controls (sekarang jadi elemen paling atas) ---------- */
+  .controls{ padding:48px 0 0; }
+  .search-row{ display:flex; gap:10px; margin-bottom:14px; }
   .search-slot{
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:10px; flex:1;
     background:var(--card); border:1px solid var(--card-border); border-radius:8px;
-    padding:11px 14px; margin-bottom:14px;
+    padding:11px 14px;
   }
   .search-slot svg{ flex:none; opacity:.5; }
   .search-slot input{
@@ -69,8 +45,17 @@
     font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--ink);
   }
   .search-slot input::placeholder{ color: var(--ink-faint); }
+  .reload-btn{
+    flex:none; width:40px; height:40px; border-radius:8px;
+    background:var(--card); border:1px solid var(--card-border); color:var(--ink-soft);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition: color .15s ease, border-color .15s ease, transform .3s ease;
+  }
+  .reload-btn:hover{ color:#4C8DFF; border-color:#4C8DFF; }
+  .reload-btn.spinning svg{ animation: spin .7s linear; }
+  @keyframes spin{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
 
-  .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+  .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
   .tab{
     font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.03em;
     background:transparent; color: var(--tab-color, var(--ink-soft));
@@ -82,6 +67,13 @@
   .tab .swatch{ width:7px; height:7px; border-radius:50%; background: var(--tab-color, var(--ink-faint)); }
   .tab.active{ background: var(--tab-color, var(--gray)); color:#101216; font-weight:600; }
   .tab.active .swatch{ background:#101216; }
+
+  .meta-bar{
+    font-size:11.5px; color:var(--ink-faint); letter-spacing:.03em;
+    padding-bottom:18px; border-bottom:1px solid var(--card-border); margin-bottom:20px;
+  }
+  .meta-bar b{ color:var(--ink); font-weight:600; }
+  .meta-bar.error{ color:#F0473E; }
 
   main{ padding-bottom:80px; }
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(256px,1fr)); gap:16px; }
@@ -115,8 +107,6 @@
     margin-bottom:14px;
   }
 
-  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; }
-
   .card h3{
     font-family:'Space Grotesk', sans-serif;
     font-weight:600; font-size:16.5px; line-height:1.3;
@@ -148,6 +138,13 @@
   .empty{ display:none; text-align:center; padding:60px 20px; color:var(--ink-faint); font-size:14px; }
   .empty.show{ display:block; }
 
+  .sample-banner{
+    display:none;
+    background:#2A2412; border:1px solid #F0B429; color:#F0B429;
+    font-size:12px; padding:10px 14px; border-radius:8px; margin-bottom:18px;
+  }
+  .sample-banner.show{ display:block; }
+
   footer{
     border-top:1px solid var(--card-border); padding:26px 0 50px;
     font-size:12px; color:var(--ink-faint);
@@ -155,26 +152,25 @@
   }
   footer a{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:3px; }
 
-  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
-  @media (max-width:560px){ .controls{ position:static; } }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .reload-btn.spinning svg{ animation:none; } }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <header class="hero">
-    <span class="eyebrow"><span class="bar"></span> Sistem Katalog</span>
-    <h1 class="title">Katalog Karya</h1>
-    <p class="subtitle">Setiap kartu terhubung ke aplikasi web yang bisa dibuka dan dipakai langsung. Warna menandai kategori, bukan hiasan.</p>
-    <div class="stat-row" id="statRow"></div>
-  </header>
-
   <div class="controls">
-    <div class="search-slot">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="search" type="text" placeholder="Cari judul, deskripsi, atau kategori…" autocomplete="off">
+    <p class="sample-banner" id="sampleBanner">Menampilkan data contoh — sambungkan URL Google Sheet Anda di CONFIG.SHEET_API_URL pada kode.</p>
+    <div class="search-row">
+      <div class="search-slot">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="search" type="text" placeholder="Cari judul, deskripsi, atau kategori…" autocomplete="off">
+      </div>
+      <button class="reload-btn" id="reloadBtn" title="Muat ulang data">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
     </div>
     <div class="tabs" id="tabs"></div>
+    <p class="meta-bar" id="metaBar">Memuat katalog…</p>
   </div>
 
   <main>
@@ -183,35 +179,33 @@
   </main>
 
   <footer>
-    <span>© <span id="year"></span> — dirawat manual, satu file, tanpa build step.</span>
+    <span>© <span id="year"></span> — data diatur lewat Google Sheet.</span>
     <a href="https://github.com/" target="_blank" rel="noopener">github.com/username</a>
   </footer>
 </div>
 
 <script>
 /* =========================================================================
-   DATA KATALOG — edit di sini untuk menambah / mengubah proyek
+   KONFIGURASI
+   -------------------------------------------------------------------------
+   Tempel URL Web App Apps Script di sini (lihat panduan deploy yang menyertai
+   file ini). Selama masih kosong, halaman akan pakai data contoh di bawah.
    ========================================================================= */
-const DATA = [
+const CONFIG = {
+  SHEET_API_URL: "https://script.google.com/macros/s/AKfycbzqM3jx8bE3iYF4I0u3N9o_fAiefUXKSInYUg41jtC_PK2rQZwRuJjKGEbwEr6uih8efA/exec" // contoh: "https://script.google.com/macros/s/XXXXXXXX/exec"
+};
+
+/* Data contoh — hanya dipakai kalau SHEET_API_URL kosong atau gagal diakses */
+const SAMPLE_DATA = [
   { title: "Habit Tracker", desc: "Pelacak kebiasaan harian dengan grafik progres mingguan.", url: "#", category: "Alat", status: "live" },
-  { title: "Split Bill", desc: "Hitung dan bagi tagihan patungan dalam hitungan detik.", url: "#", category: "Alat", status: "live" },
   { title: "Pixel Sketch", desc: "Kanvas piksel mini untuk iseng menggambar dan ekspor PNG.", url: "#", category: "Eksperimen", status: "beta" },
-  { title: "Reader Mode", desc: "Bersihkan halaman artikel dari iklan, sisakan teksnya saja.", url: "#", category: "Utilitas", status: "live" },
-  { title: "Word Chain", desc: "Permainan sambung kata dua pemain di satu tab browser.", url: "#", category: "Permainan", status: "live" },
   { title: "CSV Peek", desc: "Tempel CSV, langsung lihat tabel, statistik, dan grafik.", url: "#", category: "Data", status: "live" },
-  { title: "Focus Timer", desc: "Timer pomodoro dengan suara ambient dan catatan sesi.", url: "#", category: "Alat", status: "live" },
-  { title: "Color Picker+", desc: "Ambil warna dari gambar, dapatkan HEX, RGB, dan palet.", url: "#", category: "Utilitas", status: "live" },
-  { title: "Old Portfolio", desc: "Versi pertama situs ini sebelum dirombak. Disimpan arsip.", url: "#", category: "Eksperimen", status: "archived" },
-  { title: "Quote Wall", desc: "Kutipan favorit dengan tampilan kartu acak tiap dimuat.", url: "#", category: "Eksperimen", status: "beta" },
-  { title: "Expense Split", desc: "Catat pengeluaran kelompok, lihat siapa berhutang otomatis.", url: "#", category: "Data", status: "live" },
   { title: "Memory Match", desc: "Permainan kartu memori klasik, tiga tingkat kesulitan.", url: "#", category: "Permainan", status: "live" },
-  { title: "Markdown Live", desc: "Editor markdown dengan pratinjau langsung, ekspor HTML.", url: "#", category: "Alat", status: "live" },
   { title: "QR Generator", desc: "Buat kode QR dari teks atau tautan, unduh sebagai gambar.", url: "#", category: "Utilitas", status: "live" },
-  { title: "Weather Glance", desc: "Ringkasan cuaca tujuh hari, tampilan minim dan cepat.", url: "#", category: "Data", status: "beta" },
-  { title: "Typing Test", desc: "Uji kecepatan mengetik dengan skor WPM dan akurasi.", url: "#", category: "Permainan", status: "live" },
 ];
 
-/* Warna & ikon per kategori — satu-satunya sumber warna di halaman ini */
+/* Warna & ikon per kategori — satu-satunya sumber warna di halaman ini.
+   Tambah baris baru di sini kalau menambah kategori baru di Google Sheet. */
 const CATEGORY_META = {
   "Alat":       { color: "#4C8DFF", icon: "gauge" },
   "Permainan":  { color: "#9B6BFF", icon: "controller" },
@@ -229,20 +223,26 @@ const ICONS = {
   hexagon: `<polygon points="12,3 20,7.5 20,16.5 12,21 4,16.5 4,7.5"/>`,
 };
 
-/* ================= render — umumnya tidak perlu diubah ================= */
+/* ================= state & render — umumnya tidak perlu diubah ================= */
+let DATA = [];
+let categories = ["Semua"];
+let activeCategory = "Semua";
+
 const grid = document.getElementById('grid');
 const tabsEl = document.getElementById('tabs');
 const searchEl = document.getElementById('search');
 const emptyEl = document.getElementById('empty');
-const statRow = document.getElementById('statRow');
+const metaBar = document.getElementById('metaBar');
+const sampleBanner = document.getElementById('sampleBanner');
+const reloadBtn = document.getElementById('reloadBtn');
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const categories = ["Semua", ...Array.from(new Set(DATA.map(d => d.category)))];
-let activeCategory = "Semua";
-
 function meta(cat){ return CATEGORY_META[cat] || DEFAULT_META; }
+function statusLabel(s){ return { live:"Aktif", beta:"Beta", archived:"Arsip" }[s] || s || "Aktif"; }
 
 function buildTabs(){
+  categories = ["Semua", ...Array.from(new Set(DATA.map(d => d.category).filter(Boolean)))];
+  if (!categories.includes(activeCategory)) activeCategory = "Semua";
   tabsEl.innerHTML = "";
   categories.forEach(cat => {
     const btn = document.createElement('button');
@@ -255,13 +255,11 @@ function buildTabs(){
   });
 }
 
-function statusLabel(s){ return { live:"Aktif", beta:"Beta", archived:"Arsip" }[s] || s; }
-
 function render(){
   const q = searchEl.value.trim().toLowerCase();
   const filtered = DATA.filter(d => {
     const matchesCat = activeCategory === "Semua" || d.category === activeCategory;
-    const matchesQ = !q || (d.title + d.desc + d.category).toLowerCase().includes(q);
+    const matchesQ = !q || ((d.title||"") + (d.desc||"") + (d.category||"")).toLowerCase().includes(q);
     return matchesCat && matchesQ;
   });
 
@@ -270,16 +268,16 @@ function render(){
     const m = meta(d.category);
     const a = document.createElement('a');
     a.className = 'card' + (d.status === 'archived' ? ' archived' : '');
-    a.href = d.url; a.target = '_blank'; a.rel = 'noopener';
+    a.href = d.url || '#'; a.target = '_blank'; a.rel = 'noopener';
     a.style.setProperty('--accent', d.status === 'archived' ? '#565C66' : m.color);
     a.innerHTML = `
       <div class="icon-frame">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[m.icon]}</svg>
       </div>
-      <h3>${d.title}${d.status === 'beta' ? '<span class="beta-tag">Beta</span>' : ''}</h3>
-      <p>${d.desc}</p>
+      <h3>${d.title || "(tanpa judul)"}${d.status === 'beta' ? '<span class="beta-tag">Beta</span>' : ''}</h3>
+      <p>${d.desc || ""}</p>
       <div class="card-bottom">
-        <span>${d.category} · ${statusLabel(d.status)}</span>
+        <span>${d.category || "Lainnya"} · ${statusLabel(d.status)}</span>
         <span class="open">Buka →</span>
       </div>
     `;
@@ -287,12 +285,45 @@ function render(){
   });
 
   emptyEl.classList.toggle('show', filtered.length === 0);
-  statRow.innerHTML = `<span><b>${DATA.length}</b> entri dalam katalog</span><span><b>${categories.length - 1}</b> kategori</span>`;
+  metaBar.classList.remove('error');
+  metaBar.innerHTML = `<b>${DATA.length}</b> entri dalam katalog · <b>${categories.length - 1}</b> kategori`;
+}
+
+/* ================= pengambilan data dari Google Sheet ================= */
+async function loadData(){
+  reloadBtn.classList.add('spinning');
+
+  if (!CONFIG.SHEET_API_URL) {
+    DATA = SAMPLE_DATA;
+    sampleBanner.classList.add('show');
+    buildTabs();
+    render();
+    reloadBtn.classList.remove('spinning');
+    return;
+  }
+
+  metaBar.textContent = "Memuat katalog…";
+  try {
+    const res = await fetch(CONFIG.SHEET_API_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("Respons tidak OK");
+    const json = await res.json();
+    if (!Array.isArray(json)) throw new Error("Format data tidak sesuai");
+    DATA = json;
+    sampleBanner.classList.remove('show');
+  } catch (err) {
+    DATA = SAMPLE_DATA;
+    sampleBanner.classList.add('show');
+    metaBar.classList.add('error');
+    metaBar.textContent = "Gagal memuat dari Google Sheet — menampilkan data contoh. (" + err.message + ")";
+  }
+  buildTabs();
+  render();
+  reloadBtn.classList.remove('spinning');
 }
 
 searchEl.addEventListener('input', render);
-buildTabs();
-render();
+reloadBtn.addEventListener('click', loadData);
+loadData();
 </script>
 
 </body>
