@@ -1,0 +1,110 @@
+[
+  {
+    "id": 1,
+    "title": "Invoice Generator",
+    "subtitle": "Create PDF Invoice",
+    "description": "Generate professional PDF invoices instantly.",
+    "category": "Finance",
+    "status": "live",
+    "featured": true,
+    "thumbnail": "assets/images/invoice.jpg",
+    "url": "https://example.com/invoice",
+    "github": "https://github.com/username/invoice",
+    "lastUpdate": "2026-07-01",
+    "tags": [
+      "PDF",
+      "JavaScript",
+      "HTML"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Inventory System",
+    "subtitle": "Warehouse Manager",
+    "description": "Manage stock, products and warehouse activities.",
+    "category": "Warehouse",
+    "status": "live",
+    "featured": false,
+    "thumbnail": "assets/images/inventory.jpg",
+    "url": "https://example.com/inventory",
+    "github": "https://github.com/username/inventory",
+    "lastUpdate": "2026-06-18",
+    "tags": [
+      "Dashboard",
+      "CRUD",
+      "Firebase"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "GIS Viewer",
+    "subtitle": "Interactive Map",
+    "description": "Display GIS layers and interactive maps.",
+    "category": "GIS",
+    "status": "beta",
+    "featured": true,
+    "thumbnail": "assets/images/gis.jpg",
+    "url": "https://example.com/gis",
+    "github": "",
+    "lastUpdate": "2026-07-10",
+    "tags": [
+      "Leaflet",
+      "Map",
+      "GIS"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "AI Chat",
+    "subtitle": "OpenAI Integration",
+    "description": "Simple AI assistant powered by OpenAI API.",
+    "category": "AI",
+    "status": "development",
+    "featured": false,
+    "thumbnail": "assets/images/ai.jpg",
+    "url": "https://example.com/ai",
+    "github": "",
+    "lastUpdate": "2026-07-15",
+    "tags": [
+      "AI",
+      "API",
+      "Chat"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Attendance System",
+    "subtitle": "QR Attendance",
+    "description": "Attendance application using QR Code scanning.",
+    "category": "Education",
+    "status": "live",
+    "featured": false,
+    "thumbnail": "assets/images/attendance.jpg",
+    "url": "https://example.com/attendance",
+    "github": "",
+    "lastUpdate": "2026-05-12",
+    "tags": [
+      "QR",
+      "Education",
+      "PWA"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "POS System",
+    "subtitle": "Point of Sale",
+    "description": "Cashier application for retail stores.",
+    "category": "Retail",
+    "status": "beta",
+    "featured": false,
+    "thumbnail": "assets/images/pos.jpg",
+    "url": "https://example.com/pos",
+    "github": "",
+    "lastUpdate": "2026-06-01",
+    "tags": [
+      "POS",
+      "Cashier",
+      "Dashboard"
+    ]
+  }
+]
