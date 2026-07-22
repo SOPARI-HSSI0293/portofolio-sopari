@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Katalog — Karya yang Bisa Dipakai</title>
 <script>
-  /* Set tema sesegera mungkin supaya tidak ada kedipan warna saat halaman dimuat */
   (function(){
     var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
@@ -37,8 +36,8 @@
   }
 
   *{ box-sizing:border-box; }
+  html, body{ height:100%; margin:0; }
   body{
-    margin:0;
     background: var(--bg);
     color: var(--ink);
     font-family:'IBM Plex Mono', monospace;
@@ -49,9 +48,19 @@
   ::selection{ background:#4C8DFF; color:#fff; }
   :focus-visible{ outline:2px solid #4C8DFF; outline-offset:3px; }
 
-  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  /* ---------- kerangka halaman: header & footer tetap, area kartu yang scroll ---------- */
+  .page{ display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+  .wrap{ width:100%; padding:0 1cm; box-sizing:border-box; }
 
-  .controls{ padding:44px 0 0; }
+  .controls{ flex:none; padding-top:36px; }
+  .tagline{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:clamp(15px, 1.6vw, 18px);
+    color: var(--ink-soft);
+    margin:0 0 18px;
+    letter-spacing:.01em;
+  }
   .search-row{ display:flex; gap:10px; margin-bottom:14px; }
   .search-slot{
     display:flex; align-items:center; gap:10px; flex:1;
@@ -81,7 +90,7 @@
   html[data-theme="dark"] .theme-toggle .icon-sun{ display:block; }
   html[data-theme="dark"] .theme-toggle .icon-moon{ display:none; }
 
-  .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
   .tab{
     font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.03em;
     background:transparent; color: var(--tab-color, var(--ink-soft));
@@ -95,15 +104,15 @@
   .tab.active .swatch{ background:#101216; }
 
   .meta-bar{
-    font-size:11.5px; color:var(--ink-faint); letter-spacing:.03em;
-    padding-bottom:18px; border-bottom:1px solid var(--card-border); margin-bottom:20px;
-    transition: border-color .2s ease;
+    display:none;
+    font-size:11.5px; color:#E05248; letter-spacing:.03em;
+    padding-bottom:14px;
   }
-  .meta-bar b{ color:var(--ink); font-weight:600; }
-  .meta-bar.error{ color:#E05248; }
+  .meta-bar.show{ display:block; }
 
-  main{ padding-bottom:80px; }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(256px,1fr)); gap:16px; }
+  /* ---------- area kartu (satu-satunya bagian yang scroll) ---------- */
+  main{ flex:1 1 auto; overflow-y:auto; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(256px,1fr)); gap:16px; padding-bottom:32px; }
 
   .card{
     position:relative;
@@ -181,21 +190,23 @@
   }
   .sample-banner.show{ display:block; }
 
+  /* ---------- footer: selalu terlihat ---------- */
   footer{
-    border-top:1px solid var(--card-border); padding:26px 0 50px;
+    flex:none;
+    border-top:1px solid var(--card-border);
+    padding-top:16px; padding-bottom:20px;
     font-size:12px; color:var(--ink-faint);
-    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
     transition: border-color .2s ease;
   }
-  footer a{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:3px; }
 
   @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .icon-btn.spinning svg{ animation:none; } }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="controls">
+<div class="page">
+  <div class="wrap controls">
+    <p class="tagline">Merangkai Hal-hal yang berserak.</p>
     <p class="sample-banner" id="sampleBanner">Menampilkan data contoh — sambungkan URL Google Sheet Anda di CONFIG.SHEET_API_URL pada kode.</p>
     <div class="search-row">
       <div class="search-slot">
@@ -211,17 +222,16 @@
       </button>
     </div>
     <div class="tabs" id="tabs"></div>
-    <p class="meta-bar" id="metaBar">Memuat katalog…</p>
+    <p class="meta-bar" id="metaBar"></p>
   </div>
 
-  <main>
+  <main class="wrap">
     <div class="grid" id="grid"></div>
     <p class="empty" id="empty">Tidak ada entri yang cocok. Coba kata kunci lain.</p>
   </main>
 
-  <footer>
+  <footer class="wrap">
     <span>© <span id="year"></span> — data diatur lewat Google Sheet.</span>
-    <a href="https://github.com/" target="_blank" rel="noopener">github.com/username</a>
   </footer>
 </div>
 
@@ -344,8 +354,6 @@ function render(){
   });
 
   emptyEl.classList.toggle('show', filtered.length === 0);
-  metaBar.classList.remove('error');
-  metaBar.innerHTML = `<b>${DATA.length}</b> entri dalam katalog · <b>${ALL_CATEGORIES.length - 1}</b> kategori`;
 }
 
 /* ================= pengambilan data dari Google Sheet ================= */
@@ -355,6 +363,7 @@ function withParsedCategories(items){
 
 async function loadData(){
   reloadBtn.classList.add('spinning');
+  metaBar.classList.remove('show');
 
   if (!CONFIG.SHEET_API_URL) {
     DATA = withParsedCategories(SAMPLE_DATA);
@@ -365,7 +374,6 @@ async function loadData(){
     return;
   }
 
-  metaBar.textContent = "Memuat katalog…";
   try {
     const res = await fetch(CONFIG.SHEET_API_URL, { cache: "no-store" });
     if (!res.ok) throw new Error("Respons tidak OK");
@@ -376,8 +384,8 @@ async function loadData(){
   } catch (err) {
     DATA = withParsedCategories(SAMPLE_DATA);
     sampleBanner.classList.add('show');
-    metaBar.classList.add('error');
     metaBar.textContent = "Gagal memuat dari Google Sheet — menampilkan data contoh. (" + err.message + ")";
+    metaBar.classList.add('show');
   }
   buildTabs();
   render();
