@@ -4,19 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Katalog — Karya yang Bisa Dipakai</title>
+<script>
+  /* Set tema sesegera mungkin supaya tidak ada kedipan warna saat halaman dimuat */
+  (function(){
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg: #14161B;
-    --card: #1B1E24;
-    --card-border: #272B33;
-    --ink: #ECEDEE;
-    --ink-soft: #9AA0A8;
-    --ink-faint: #656B75;
-    --gray: #565C66;
+  html[data-theme="dark"]{
+    --bg: #1B1D22;
+    --card: #23262E;
+    --card-border: #30343D;
+    --ink: #E7E8EA;
+    --ink-soft: #A6ACB5;
+    --ink-faint: #6E7480;
+    --gray: #5B6270;
+    --shadow: rgba(0,0,0,0.32);
   }
+  html[data-theme="light"]{
+    --bg: #F2F3F6;
+    --card: #FFFFFF;
+    --card-border: #E3E5EA;
+    --ink: #23262E;
+    --ink-soft: #565C68;
+    --ink-faint: #8A8F9A;
+    --gray: #B7BCC6;
+    --shadow: rgba(35,38,46,0.10);
+  }
+
   *{ box-sizing:border-box; }
   body{
     margin:0;
@@ -24,6 +43,7 @@
     color: var(--ink);
     font-family:'IBM Plex Mono', monospace;
     -webkit-font-smoothing: antialiased;
+    transition: background .2s ease, color .2s ease;
   }
   a{ color:inherit; }
   ::selection{ background:#4C8DFF; color:#fff; }
@@ -31,13 +51,13 @@
 
   .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
 
-  /* ---------- controls (sekarang jadi elemen paling atas) ---------- */
-  .controls{ padding:48px 0 0; }
+  .controls{ padding:44px 0 0; }
   .search-row{ display:flex; gap:10px; margin-bottom:14px; }
   .search-slot{
     display:flex; align-items:center; gap:10px; flex:1;
     background:var(--card); border:1px solid var(--card-border); border-radius:8px;
     padding:11px 14px;
+    transition: background .2s ease, border-color .2s ease;
   }
   .search-slot svg{ flex:none; opacity:.5; }
   .search-slot input{
@@ -45,15 +65,21 @@
     font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--ink);
   }
   .search-slot input::placeholder{ color: var(--ink-faint); }
-  .reload-btn{
+
+  .icon-btn{
     flex:none; width:40px; height:40px; border-radius:8px;
     background:var(--card); border:1px solid var(--card-border); color:var(--ink-soft);
     cursor:pointer; display:flex; align-items:center; justify-content:center;
-    transition: color .15s ease, border-color .15s ease, transform .3s ease;
+    transition: color .15s ease, border-color .15s ease, background .2s ease;
   }
-  .reload-btn:hover{ color:#4C8DFF; border-color:#4C8DFF; }
-  .reload-btn.spinning svg{ animation: spin .7s linear; }
+  .icon-btn:hover{ color:#4C8DFF; border-color:#4C8DFF; }
+  .icon-btn.spinning svg{ animation: spin .7s linear; }
   @keyframes spin{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
+
+  .theme-toggle .icon-sun{ display:none; }
+  .theme-toggle .icon-moon{ display:block; }
+  html[data-theme="dark"] .theme-toggle .icon-sun{ display:block; }
+  html[data-theme="dark"] .theme-toggle .icon-moon{ display:none; }
 
   .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
   .tab{
@@ -62,7 +88,7 @@
     border:1px solid var(--tab-color, var(--card-border));
     padding:7px 13px; border-radius:20px; cursor:pointer;
     display:inline-flex; align-items:center; gap:7px;
-    transition: background .15s ease, color .15s ease;
+    transition: background .15s ease, color .15s ease, border-color .2s ease;
   }
   .tab .swatch{ width:7px; height:7px; border-radius:50%; background: var(--tab-color, var(--ink-faint)); }
   .tab.active{ background: var(--tab-color, var(--gray)); color:#101216; font-weight:600; }
@@ -71,9 +97,10 @@
   .meta-bar{
     font-size:11.5px; color:var(--ink-faint); letter-spacing:.03em;
     padding-bottom:18px; border-bottom:1px solid var(--card-border); margin-bottom:20px;
+    transition: border-color .2s ease;
   }
   .meta-bar b{ color:var(--ink); font-weight:600; }
-  .meta-bar.error{ color:#F0473E; }
+  .meta-bar.error{ color:#E05248; }
 
   main{ padding-bottom:80px; }
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(256px,1fr)); gap:16px; }
@@ -84,8 +111,8 @@
     background:var(--card); border:1px solid var(--card-border);
     border-radius:10px; padding:20px 18px 16px 22px;
     text-decoration:none; color:var(--ink); overflow:hidden;
-    min-height:172px;
-    transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    min-height:188px;
+    transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .2s ease;
   }
   .card::before{
     content:""; position:absolute; left:0; top:0; bottom:0; width:3px;
@@ -94,7 +121,7 @@
   .card:hover, .card:focus-visible{
     transform: translateY(-3px);
     border-color: var(--accent, var(--gray));
-    box-shadow: 0 12px 24px rgba(0,0,0,0.35);
+    box-shadow: 0 12px 24px var(--shadow);
   }
   .card.archived{ opacity:.55; }
 
@@ -115,19 +142,27 @@
   }
   .beta-tag{
     font-size:9.5px; letter-spacing:.06em; text-transform:uppercase;
-    color:#F0B429; border:1px solid #F0B429; border-radius:3px; padding:1px 5px;
+    color:#C98A1E; border:1px solid #C98A1E; border-radius:3px; padding:1px 5px;
     font-family:'IBM Plex Mono', monospace; font-weight:600;
   }
 
   .card p{
-    font-size:12.5px; line-height:1.55; color:var(--ink-soft); margin:0;
-    flex-grow:1;
+    font-size:12.5px; line-height:1.55; color:var(--ink-soft); margin:0 0 12px;
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:5px; margin-top:auto; }
+  .chip{
+    font-size:9.5px; letter-spacing:.03em;
+    color: var(--c, var(--ink-soft));
+    background: color-mix(in srgb, var(--c, var(--gray)) 14%, transparent);
+    border:1px solid color-mix(in srgb, var(--c, var(--gray)) 35%, transparent);
+    padding:2px 7px; border-radius:10px;
   }
 
   .card-bottom{
     display:flex; align-items:center; justify-content:space-between;
-    margin-top:14px; padding-top:12px; border-top:1px solid var(--card-border);
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--card-border);
     font-size:11px; color:var(--ink-faint);
   }
   .open{
@@ -140,7 +175,8 @@
 
   .sample-banner{
     display:none;
-    background:#2A2412; border:1px solid #F0B429; color:#F0B429;
+    background: color-mix(in srgb, #F0B429 16%, var(--card));
+    border:1px solid #F0B429; color:#B8862B;
     font-size:12px; padding:10px 14px; border-radius:8px; margin-bottom:18px;
   }
   .sample-banner.show{ display:block; }
@@ -149,10 +185,11 @@
     border-top:1px solid var(--card-border); padding:26px 0 50px;
     font-size:12px; color:var(--ink-faint);
     display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    transition: border-color .2s ease;
   }
   footer a{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:3px; }
 
-  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .reload-btn.spinning svg{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .icon-btn.spinning svg{ animation:none; } }
 </style>
 </head>
 <body>
@@ -165,7 +202,11 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
         <input id="search" type="text" placeholder="Cari judul, deskripsi, atau kategori…" autocomplete="off">
       </div>
-      <button class="reload-btn" id="reloadBtn" title="Muat ulang data">
+      <button class="icon-btn theme-toggle" id="themeToggle" title="Ganti mode gelap/terang">
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="4.2" y1="4.2" x2="6" y2="6"/><line x1="18" y1="18" x2="19.8" y2="19.8"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.2" y1="19.8" x2="6" y2="18"/><line x1="18" y1="6" x2="19.8" y2="4.2"/></svg>
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a7 7 0 0 0 9.5 9.5z"/></svg>
+      </button>
+      <button class="icon-btn" id="reloadBtn" title="Muat ulang data">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       </button>
     </div>
@@ -187,46 +228,63 @@
 <script>
 /* =========================================================================
    KONFIGURASI
-   -------------------------------------------------------------------------
-   Tempel URL Web App Apps Script di sini (lihat panduan deploy yang menyertai
-   file ini). Selama masih kosong, halaman akan pakai data contoh di bawah.
    ========================================================================= */
 const CONFIG = {
   SHEET_API_URL: "https://script.google.com/macros/s/AKfycbzqM3jx8bE3iYF4I0u3N9o_fAiefUXKSInYUg41jtC_PK2rQZwRuJjKGEbwEr6uih8efA/exec" // contoh: "https://script.google.com/macros/s/XXXXXXXX/exec"
 };
 
-/* Data contoh — hanya dipakai kalau SHEET_API_URL kosong atau gagal diakses */
+/* Data contoh — dipakai kalau SHEET_API_URL kosong atau gagal diakses.
+   Kolom "category" boleh berisi lebih dari satu kategori, dipisah "/". */
 const SAMPLE_DATA = [
-  { title: "Habit Tracker", desc: "Pelacak kebiasaan harian dengan grafik progres mingguan.", url: "#", category: "Alat", status: "live" },
-  { title: "Pixel Sketch", desc: "Kanvas piksel mini untuk iseng menggambar dan ekspor PNG.", url: "#", category: "Eksperimen", status: "beta" },
-  { title: "CSV Peek", desc: "Tempel CSV, langsung lihat tabel, statistik, dan grafik.", url: "#", category: "Data", status: "live" },
-  { title: "Memory Match", desc: "Permainan kartu memori klasik, tiga tingkat kesulitan.", url: "#", category: "Permainan", status: "live" },
-  { title: "QR Generator", desc: "Buat kode QR dari teks atau tautan, unduh sebagai gambar.", url: "#", category: "Utilitas", status: "live" },
+  { title: "Invoice Auto-Sender", desc: "Kirim invoice otomatis terjadwal ke klien tanpa sentuh manual.", url: "#", category: "Automation/Workflow Efficiency", status: "live" },
+  { title: "Ops Dashboard", desc: "Ringkasan status operasional harian dalam satu layar.", url: "#", category: "Dashboard Management/Operational", status: "live" },
+  { title: "Fleet Usage Report", desc: "Analisis pemakaian armada berdasarkan data mingguan.", url: "#", category: "Data Analytics/Resource Control", status: "beta" },
+  { title: "Task Router", desc: "Distribusi tugas otomatis ke tim sesuai beban kerja.", url: "#", category: "Automation/Operational", status: "live" },
+  { title: "Inventory Watch", desc: "Pantau stok dan ambang batas gudang secara real-time.", url: "#", category: "Resource Control", status: "live" },
 ];
 
-/* Warna & ikon per kategori — satu-satunya sumber warna di halaman ini.
-   Tambah baris baru di sini kalau menambah kategori baru di Google Sheet. */
+/* Warna & ikon per kategori — taksonomi tetap, satu-satunya sumber warna di halaman ini */
 const CATEGORY_META = {
-  "Alat":       { color: "#4C8DFF", icon: "gauge" },
-  "Permainan":  { color: "#9B6BFF", icon: "controller" },
-  "Data":       { color: "#34C77B", icon: "bars" },
-  "Utilitas":   { color: "#F0B429", icon: "sliders" },
-  "Eksperimen": { color: "#F0473E", icon: "hexagon" },
+  "Automation":            { color: "#3B76E0", icon: "bolt" },
+  "Workflow Efficiency":   { color: "#1E9AA8", icon: "flow" },
+  "Data Analytics":        { color: "#23A566", icon: "bars" },
+  "Dashboard Management":  { color: "#7C4FE0", icon: "grid" },
+  "Operational":           { color: "#B8862B", icon: "sliders" },
+  "Resource Control":      { color: "#D9463D", icon: "gauge" },
 };
-const DEFAULT_META = { color: "#565C66", icon: "hexagon" };
+const DEFAULT_META = { color: "#8A8F9A", icon: "dot" };
 
 const ICONS = {
-  gauge: `<circle cx="12" cy="12" r="8"/><line x1="12" y1="12" x2="15.5" y2="8.5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>`,
-  controller: `<rect x="3" y="9" width="18" height="8" rx="4"/><circle cx="8" cy="13" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="13" r="1.1" fill="currentColor" stroke="none"/>`,
+  bolt: `<polygon points="13,2 4,14 11,14 10,22 20,9 13,9"/>`,
+  flow: `<circle cx="5" cy="19" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><line x1="6.8" y1="17.2" x2="10.2" y2="13.8"/><line x1="13.8" y1="10.2" x2="17.2" y2="6.8"/>`,
   bars: `<line x1="5" y1="19" x2="5" y2="11" stroke-width="2.4"/><line x1="12" y1="19" x2="12" y2="5" stroke-width="2.4"/><line x1="19" y1="19" x2="19" y2="14" stroke-width="2.4"/>`,
-  sliders: `<line x1="4" y1="7" x2="20" y2="7"/><circle cx="14" cy="7" r="2" fill="#1B1E24"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="9" cy="14" r="2" fill="#1B1E24"/><line x1="4" y1="19" x2="20" y2="19"/><circle cx="17" cy="19" r="2" fill="#1B1E24"/>`,
-  hexagon: `<polygon points="12,3 20,7.5 20,16.5 12,21 4,16.5 4,7.5"/>`,
+  grid: `<rect x="4" y="4" width="7" height="7" rx="1.2"/><rect x="13" y="4" width="7" height="7" rx="1.2"/><rect x="4" y="13" width="7" height="7" rx="1.2"/><rect x="13" y="13" width="7" height="7" rx="1.2"/>`,
+  sliders: `<line x1="4" y1="7" x2="20" y2="7"/><circle cx="14" cy="7" r="2" fill="var(--card)"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="9" cy="14" r="2" fill="var(--card)"/><line x1="4" y1="19" x2="20" y2="19"/><circle cx="17" cy="19" r="2" fill="var(--card)"/>`,
+  gauge: `<circle cx="12" cy="12" r="8"/><line x1="12" y1="12" x2="15.5" y2="8.5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>`,
+  dot: `<circle cx="12" cy="12" r="7"/>`,
 };
 
-/* ================= state & render — umumnya tidak perlu diubah ================= */
+/* ================= tema (gelap / terang) ================= */
+let userTheme = null; // null = ikuti preferensi sistem
+function systemTheme(){ return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+function activeTheme(){ return userTheme || systemTheme(); }
+function applyTheme(t){ document.documentElement.setAttribute('data-theme', t); }
+applyTheme(activeTheme());
+
+document.getElementById('themeToggle').addEventListener('click', () => {
+  userTheme = activeTheme() === 'dark' ? 'light' : 'dark';
+  applyTheme(userTheme);
+});
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (!userTheme) applyTheme(systemTheme());
+  });
+}
+
+/* ================= state & render ================= */
 let DATA = [];
-let categories = ["Semua"];
 let activeCategory = "Semua";
+const ALL_CATEGORIES = ["Semua", ...Object.keys(CATEGORY_META)];
 
 const grid = document.getElementById('grid');
 const tabsEl = document.getElementById('tabs');
@@ -239,12 +297,11 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
 function meta(cat){ return CATEGORY_META[cat] || DEFAULT_META; }
 function statusLabel(s){ return { live:"Aktif", beta:"Beta", archived:"Arsip" }[s] || s || "Aktif"; }
+function parseCategories(field){ return String(field || "").split("/").map(s => s.trim()).filter(Boolean); }
 
 function buildTabs(){
-  categories = ["Semua", ...Array.from(new Set(DATA.map(d => d.category).filter(Boolean)))];
-  if (!categories.includes(activeCategory)) activeCategory = "Semua";
   tabsEl.innerHTML = "";
-  categories.forEach(cat => {
+  ALL_CATEGORIES.forEach(cat => {
     const btn = document.createElement('button');
     const m = cat === "Semua" ? null : meta(cat);
     btn.className = 'tab' + (cat === activeCategory ? ' active' : '');
@@ -258,26 +315,28 @@ function buildTabs(){
 function render(){
   const q = searchEl.value.trim().toLowerCase();
   const filtered = DATA.filter(d => {
-    const matchesCat = activeCategory === "Semua" || d.category === activeCategory;
-    const matchesQ = !q || ((d.title||"") + (d.desc||"") + (d.category||"")).toLowerCase().includes(q);
+    const matchesCat = activeCategory === "Semua" || d.categories.includes(activeCategory);
+    const matchesQ = !q || ((d.title||"") + (d.desc||"") + d.categories.join(" ")).toLowerCase().includes(q);
     return matchesCat && matchesQ;
   });
 
   grid.innerHTML = "";
   filtered.forEach(d => {
-    const m = meta(d.category);
+    const primary = meta(d.categories[0]);
     const a = document.createElement('a');
     a.className = 'card' + (d.status === 'archived' ? ' archived' : '');
     a.href = d.url || '#'; a.target = '_blank'; a.rel = 'noopener';
-    a.style.setProperty('--accent', d.status === 'archived' ? '#565C66' : m.color);
+    a.style.setProperty('--accent', d.status === 'archived' ? '#8A8F9A' : primary.color);
+    const chips = d.categories.map(c => `<span class="chip" style="--c:${meta(c).color}">${c}</span>`).join('');
     a.innerHTML = `
       <div class="icon-frame">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[m.icon]}</svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[primary.icon]}</svg>
       </div>
       <h3>${d.title || "(tanpa judul)"}${d.status === 'beta' ? '<span class="beta-tag">Beta</span>' : ''}</h3>
       <p>${d.desc || ""}</p>
+      <div class="chips">${chips}</div>
       <div class="card-bottom">
-        <span>${d.category || "Lainnya"} · ${statusLabel(d.status)}</span>
+        <span>${statusLabel(d.status)}</span>
         <span class="open">Buka →</span>
       </div>
     `;
@@ -286,15 +345,19 @@ function render(){
 
   emptyEl.classList.toggle('show', filtered.length === 0);
   metaBar.classList.remove('error');
-  metaBar.innerHTML = `<b>${DATA.length}</b> entri dalam katalog · <b>${categories.length - 1}</b> kategori`;
+  metaBar.innerHTML = `<b>${DATA.length}</b> entri dalam katalog · <b>${ALL_CATEGORIES.length - 1}</b> kategori`;
 }
 
 /* ================= pengambilan data dari Google Sheet ================= */
+function withParsedCategories(items){
+  return items.map(d => ({ ...d, categories: parseCategories(d.category) }));
+}
+
 async function loadData(){
   reloadBtn.classList.add('spinning');
 
   if (!CONFIG.SHEET_API_URL) {
-    DATA = SAMPLE_DATA;
+    DATA = withParsedCategories(SAMPLE_DATA);
     sampleBanner.classList.add('show');
     buildTabs();
     render();
@@ -308,10 +371,10 @@ async function loadData(){
     if (!res.ok) throw new Error("Respons tidak OK");
     const json = await res.json();
     if (!Array.isArray(json)) throw new Error("Format data tidak sesuai");
-    DATA = json;
+    DATA = withParsedCategories(json);
     sampleBanner.classList.remove('show');
   } catch (err) {
-    DATA = SAMPLE_DATA;
+    DATA = withParsedCategories(SAMPLE_DATA);
     sampleBanner.classList.add('show');
     metaBar.classList.add('error');
     metaBar.textContent = "Gagal memuat dari Google Sheet — menampilkan data contoh. (" + err.message + ")";
