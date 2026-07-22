@@ -36,7 +36,8 @@
   }
 
   *{ box-sizing:border-box; }
-  html, body{ height:100%; margin:0; }
+  :root{ --footer-h: 46px; }
+  html, body{ margin:0; }
   body{
     background: var(--bg);
     color: var(--ink);
@@ -48,11 +49,11 @@
   ::selection{ background:#4C8DFF; color:#fff; }
   :focus-visible{ outline:2px solid #4C8DFF; outline-offset:3px; }
 
-  /* ---------- kerangka halaman: header & footer tetap, area kartu yang scroll ---------- */
-  .page{ display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+  /* ---------- kerangka halaman: seluruh halaman scroll normal, footer selalu terlihat ---------- */
+  .page{ min-height:100vh; padding-bottom: var(--footer-h); }
   .wrap{ width:100%; padding:0 1cm; box-sizing:border-box; }
 
-  .controls{ flex:none; padding-top:36px; }
+  .controls{ padding-top:0.5cm; }
   .tagline{
     font-family:'Space Grotesk', sans-serif;
     font-weight:600;
@@ -110,8 +111,7 @@
   }
   .meta-bar.show{ display:block; }
 
-  /* ---------- area kartu (satu-satunya bagian yang scroll) ---------- */
-  main{ flex:1 1 auto; overflow-y:auto; }
+  /* ---------- area kartu ---------- */
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(256px,1fr)); gap:16px; padding-bottom:32px; }
 
   .card{
@@ -190,13 +190,16 @@
   }
   .sample-banner.show{ display:block; }
 
-  /* ---------- footer: selalu terlihat ---------- */
+  /* ---------- footer: fixed, selalu terlihat di bawah layar ---------- */
   footer{
-    flex:none;
+    position:fixed; left:0; right:0; bottom:0;
+    height: var(--footer-h);
+    display:flex; align-items:center; justify-content:center;
+    background: var(--bg);
     border-top:1px solid var(--card-border);
-    padding-top:16px; padding-bottom:20px;
     font-size:12px; color:var(--ink-faint);
-    transition: border-color .2s ease;
+    text-align:center;
+    transition: background .2s ease, border-color .2s ease;
   }
 
   @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .icon-btn.spinning svg{ animation:none; } }
@@ -229,11 +232,9 @@
     <div class="grid" id="grid"></div>
     <p class="empty" id="empty">Tidak ada entri yang cocok. Coba kata kunci lain.</p>
   </main>
-
-  <footer class="wrap">
-    <span>© <span id="year"></span> — data diatur lewat Google Sheet.</span>
-  </footer>
 </div>
+
+<footer>DigitData © Sopari | 2026</footer>
 
 <script>
 /* =========================================================================
@@ -303,7 +304,6 @@ const emptyEl = document.getElementById('empty');
 const metaBar = document.getElementById('metaBar');
 const sampleBanner = document.getElementById('sampleBanner');
 const reloadBtn = document.getElementById('reloadBtn');
-document.getElementById('year').textContent = new Date().getFullYear();
 
 function meta(cat){ return CATEGORY_META[cat] || DEFAULT_META; }
 function statusLabel(s){ return { live:"Aktif", beta:"Beta", archived:"Arsip" }[s] || s || "Aktif"; }
